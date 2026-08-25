@@ -83,12 +83,6 @@ function ProjectFeed() {
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-2">
-          <FiltersPanel
-            filters={filters}
-            setFilters={setFilters}
-            extraTitle="Roles open"
-            extraOptions={ROLES_OPEN_OPTIONS}
-          />
           <Select value={sort} onValueChange={(v) => setSort(v as Sort)}>
             <SelectTrigger className="h-8 w-[150px] rounded-full border-white/12 bg-white/5 text-xs">
               <SelectValue />
@@ -105,15 +99,14 @@ function ProjectFeed() {
         </div>
       </header>
 
+      <FiltersPanel
+        filters={filters}
+        setFilters={setFilters}
+        extraTitle="Roles open"
+        extraOptions={ROLES_OPEN_OPTIONS}
+      />
+
       <div className="flex gap-6">
-        <div className="hidden lg:block">
-          <FiltersPanel
-            filters={filters}
-            setFilters={setFilters}
-            extraTitle="Roles open"
-            extraOptions={ROLES_OPEN_OPTIONS}
-          />
-        </div>
 
         <div className="min-w-0 flex-1">
           {visible.length ? (
