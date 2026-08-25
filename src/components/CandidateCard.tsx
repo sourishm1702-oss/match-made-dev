@@ -16,7 +16,7 @@ export const AVAILABILITY_STYLE: Record<string, { dot: string; text: string }> =
 };
 
 export function AvailabilityBadge({ status }: { status: string }) {
-  const s = AVAILABILITY_STYLE[status] ?? AVAILABILITY_STYLE["Not Available"];
+  const s = AVAILABILITY_STYLE[status] ?? { dot: "bg-muted-foreground", text: "text-muted-foreground" };
   return (
     <span
       className={cn(

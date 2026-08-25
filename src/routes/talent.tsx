@@ -104,16 +104,20 @@ function TalentFeed() {
                 <CandidateCard
                   key={c.id}
                   candidate={c}
-                  contextProject={contextProject}
+                  {...(contextProject ? { contextProject } : {})}
                   invited={invites.includes(c.id)}
-                  onInvite={(candidate) =>
-                    contextProject
-                      ? setTarget({ kind: "candidate", project: contextProject, candidate })
-                      : toast.info("Post a project first", {
-                          description: "You need an open project to invite someone.",
-                        })
-                  }
-                  onView={(candidate) => toast.info(candidate.name, { description: candidate.bio })}
+                  onInvite={(candidate) => {
+                    if (contextProject) {
+                      setTarget({ kind: "candidate", project: contextProject, candidate });
+                    } else {
+                      toast.info("Post a project first", {
+                        description: "You need an open project to invite someone.",
+                      });
+                    }
+                  }}
+                  onView={(candidate) => {
+                    toast.info(candidate.name, { description: candidate.bio });
+                  }}
                 />
               ))}
             </div>
