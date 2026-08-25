@@ -210,7 +210,7 @@ function Dashboard() {
         <ul className="glass divide-y divide-white/8 rounded-2xl">
           {activity.map((a) => (
             <li key={a.id} className="flex items-start gap-3 p-4">
-              <InitialsAvatar id={a.id} name={a.kind === "match" ? "AI Match" : "Activity"} size="sm" />
+              <ActivityIcon event={a} />
               <div className="min-w-0 flex-1">
                 <p className="text-sm leading-relaxed">{a.text}</p>
                 <p className="mt-0.5 text-[11px] text-muted-foreground">{a.time}</p>
