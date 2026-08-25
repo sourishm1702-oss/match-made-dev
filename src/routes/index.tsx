@@ -56,6 +56,39 @@ function StatCard({
   );
 }
 
+function activityName(event: ActivityEvent) {
+  if (event.kind === "match") return null;
+  const match = event.text.match(/^([A-Z][a-z]+(?:\s[A-Z][a-z]+)?)/);
+  return match ? match[1] : null;
+}
+
+function ActivityIcon({ event }: { event: ActivityEvent }) {
+  if (event.kind === "match") {
+    return (
+      <div
+        className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-gradient-to-br from-violet to-cyan text-background ring-1 ring-white/20"
+        aria-label="AI match"
+      >
+        <Sparkles className="h-4 w-4" aria-hidden />
+      </div>
+    );
+  }
+
+  const name = activityName(event);
+  if (name) {
+    return <InitialsAvatar id={event.id} name={name} size="sm" />;
+  }
+
+  return (
+    <div
+      className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-white/10 text-muted-foreground ring-1 ring-white/20"
+      aria-label="Activity"
+    >
+      <Activity className="h-4 w-4" aria-hidden />
+    </div>
+  );
+}
+
 function Dashboard() {
   const store = useStore();
   const { user, projects, candidates, activity, applications, invites, profileCompleteness } = store;
