@@ -99,14 +99,13 @@ function ProjectFeed() {
         </div>
       </header>
 
-      <FiltersPanel
-        filters={filters}
-        setFilters={setFilters}
-        extraTitle="Roles open"
-        extraOptions={ROLES_OPEN_OPTIONS}
-      />
-
-      <div className="flex gap-6">
+      <div className="flex flex-col gap-6 lg:flex-row">
+        <FiltersPanel
+          filters={filters}
+          setFilters={setFilters}
+          extraTitle="Roles open"
+          extraOptions={ROLES_OPEN_OPTIONS}
+        />
 
         <div className="min-w-0 flex-1">
           {visible.length ? (
