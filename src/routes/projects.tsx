@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Plus, SearchX } from "lucide-react";
+import { Plus, Search, SearchX } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { EMPTY_FILTERS, FiltersPanel, type Filters } from "@/components/FiltersPanel";
@@ -8,6 +8,7 @@ import { ProjectCard } from "@/components/ProjectCard";
 import { ProjectDetailsModal } from "@/components/ProjectDetailsModal";
 import { RequestModal, type RequestTarget } from "@/components/RequestModal";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -40,6 +41,16 @@ export const Route = createFileRoute("/projects")({
 
 type Sort = "match" | "newest" | "roles";
 
+function postedHours(postedAgo: string) {
+  const n = parseFloat(postedAgo) || 0;
+  if (/minute/.test(postedAgo)) return n / 60;
+  if (/hour/.test(postedAgo)) return n;
+  if (/day/.test(postedAgo)) return n * 24;
+  if (/week/.test(postedAgo)) return n * 168;
+  if (/month/.test(postedAgo)) return n * 720;
+  return n;
+}
+
 function ProjectFeed() {
   const store = useStore();
   const { user, projects, applications } = store;
@@ -52,7 +63,9 @@ function ProjectFeed() {
   const visible = useMemo(() => {
     const list = filterProjects(projects, filters);
     const sorted = [...list];
-    if (sort === "match") {
+    if (sort === "newest") {
+      sorted.sort((a, b) => postedHours(a.postedAgo) - postedHours(b.postedAgo));
+    } else if (sort === "match") {
       sorted.sort(
         (a, b) => matchCandidateToProject(user, b).score - matchCandidateToProject(user, a).score,
       );
@@ -83,21 +96,40 @@ function ProjectFeed() {
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-2">
-          <Select value={sort} onValueChange={(v) => setSort(v as Sort)}>
-            <SelectTrigger className="h-8 w-[150px] rounded-full border-white/12 bg-white/5 text-xs">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="match">Best Match</SelectItem>
-              <SelectItem value="newest">Newest</SelectItem>
-              <SelectItem value="roles">Most Roles Open</SelectItem>
-            </SelectContent>
-          </Select>
           <Button variant="hero" size="sm" onClick={() => setPostOpen(true)}>
             <Plus aria-hidden /> Post
           </Button>
         </div>
       </header>
+
+      <div className="glass flex flex-col gap-3 rounded-2xl p-3 sm:flex-row sm:items-center">
+        <div className="relative min-w-0 flex-1">
+          <Search
+            className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+            aria-hidden
+          />
+          <Input
+            value={filters.query}
+            onChange={(e) => setFilters({ ...filters, query: e.target.value })}
+            placeholder="Search projects by title, description, or skill…"
+            aria-label="Search projects"
+            className="rounded-full border-white/12 bg-white/5 pl-9"
+          />
+        </div>
+        <Select value={sort} onValueChange={(v) => setSort(v as Sort)}>
+          <SelectTrigger
+            aria-label="Sort projects"
+            className="h-10 w-full shrink-0 rounded-full border-white/12 bg-white/5 text-xs sm:w-[210px]"
+          >
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="match">Sort by: Best Match</SelectItem>
+            <SelectItem value="newest">Sort by: Newest</SelectItem>
+            <SelectItem value="roles">Sort by: Most Roles Open</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
       <div className="flex flex-col gap-6 lg:flex-row">
         <FiltersPanel

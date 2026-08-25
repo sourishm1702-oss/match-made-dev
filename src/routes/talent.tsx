@@ -1,11 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { SearchX } from "lucide-react";
+import { Search, SearchX } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { CandidateCard } from "@/components/CandidateCard";
 import { EMPTY_FILTERS, FiltersPanel, type Filters } from "@/components/FiltersPanel";
 import { RequestModal, type RequestTarget } from "@/components/RequestModal";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -36,6 +37,8 @@ export const Route = createFileRoute("/talent")({
   component: TalentFeed,
 });
 
+type Sort = "match" | "newest" | "roles";
+
 function TalentFeed() {
   const store = useStore();
   const { user, projects, candidates, invites } = store;
@@ -43,18 +46,26 @@ function TalentFeed() {
   const [projectId, setProjectId] = useState(myProjects[0]?.id ?? "");
   const [filters, setFilters] = useState<Filters>({ ...EMPTY_FILTERS });
   const [target, setTarget] = useState<RequestTarget | null>(null);
+  const [sort, setSort] = useState<Sort>("match");
 
   const contextProject = myProjects.find((p) => p.id === projectId) ?? myProjects[0];
 
   const visible = useMemo(() => {
     const list = filterCandidates(candidates, filters);
-    if (!contextProject) return list;
-    return [...list].sort(
-      (a, b) =>
-        matchCandidateToProject(b, contextProject).score -
-        matchCandidateToProject(a, contextProject).score,
-    );
-  }, [candidates, filters, contextProject]);
+    const sorted = [...list];
+    if (sort === "newest") {
+      sorted.reverse();
+    } else if (sort === "roles") {
+      sorted.sort((a, b) => b.skills.length - a.skills.length);
+    } else if (contextProject) {
+      sorted.sort(
+        (a, b) =>
+          matchCandidateToProject(b, contextProject).score -
+          matchCandidateToProject(a, contextProject).score,
+      );
+    }
+    return sorted;
+  }, [candidates, filters, contextProject, sort]);
 
   const send = (t: RequestTarget) => {
     store.invite(t.candidate.id);
@@ -88,6 +99,35 @@ function TalentFeed() {
           </Select>
         )}
       </header>
+
+      <div className="glass flex flex-col gap-3 rounded-2xl p-3 sm:flex-row sm:items-center">
+        <div className="relative min-w-0 flex-1">
+          <Search
+            className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+            aria-hidden
+          />
+          <Input
+            value={filters.query}
+            onChange={(e) => setFilters({ ...filters, query: e.target.value })}
+            placeholder="Search people by name, role, or skill…"
+            aria-label="Search candidates"
+            className="rounded-full border-white/12 bg-white/5 pl-9"
+          />
+        </div>
+        <Select value={sort} onValueChange={(v) => setSort(v as Sort)}>
+          <SelectTrigger
+            aria-label="Sort candidates"
+            className="h-10 w-full shrink-0 rounded-full border-white/12 bg-white/5 text-xs sm:w-[210px]"
+          >
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="match">Sort by: Best Match</SelectItem>
+            <SelectItem value="newest">Sort by: Newest</SelectItem>
+            <SelectItem value="roles">Sort by: Most Skills</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
       <div className="flex flex-col gap-6 lg:flex-row">
         <FiltersPanel

@@ -1,4 +1,5 @@
 import { Sparkles } from "lucide-react";
+import { useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import type { MatchBreakdown } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
@@ -45,12 +46,17 @@ export function MatchBadge({
   className?: string;
 }) {
   const t = tier(breakdown.score);
+  const [open, setOpen] = useState(false);
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <button
           type="button"
           aria-label={`${breakdown.score}% match — view breakdown`}
+          onMouseEnter={() => setOpen(true)}
+          onMouseLeave={() => setOpen(false)}
+          onFocus={() => setOpen(true)}
+          onBlur={() => setOpen(false)}
           style={t.style}
           className={cn(
             "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-bold transition-transform duration-200 hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
@@ -62,7 +68,12 @@ export function MatchBadge({
           {breakdown.score}% {label}
         </button>
       </PopoverTrigger>
-      <PopoverContent className="w-60 glass rounded-xl p-3 text-foreground" align="end">
+      <PopoverContent
+        className="w-60 glass rounded-xl p-3 text-foreground"
+        align="end"
+        onMouseEnter={() => setOpen(true)}
+        onMouseLeave={() => setOpen(false)}
+      >
         <p className="mb-2.5 flex items-center gap-1.5 text-xs font-semibold">
           <Sparkles className="h-3.5 w-3.5 text-violet" aria-hidden /> AI match breakdown
         </p>
