@@ -96,16 +96,6 @@ function ProjectFeed() {
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-2">
-          <Select value={sort} onValueChange={(v) => setSort(v as Sort)}>
-            <SelectTrigger className="h-8 w-[150px] rounded-full border-white/12 bg-white/5 text-xs">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="match">Best Match</SelectItem>
-              <SelectItem value="newest">Newest</SelectItem>
-              <SelectItem value="roles">Most Roles Open</SelectItem>
-            </SelectContent>
-          </Select>
           <Button variant="hero" size="sm" onClick={() => setPostOpen(true)}>
             <Plus aria-hidden /> Post
           </Button>
